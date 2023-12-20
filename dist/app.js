@@ -13,7 +13,7 @@ const autoBind = (_, _2, descriptor) => {
         get() {
             const boundFn = originalMethod.bind(this);
             return boundFn;
-        }
+        },
     };
     return adjDescriptor;
 };
@@ -32,9 +32,28 @@ class ProjectInput {
         this.configure();
         this.attach();
     }
+    gatherUserInput() {
+        const title = this.titleInput.value;
+        const description = this.descriptionInput.value;
+        const people = this.peopleInput.value;
+        if (title.trim().length == 0 ||
+            description.trim().length == 0 ||
+            people.trim().length == 0) {
+            alert('Invalid input');
+            return;
+        }
+        else {
+            return [title, description, +people];
+        }
+    }
     submitHandler(event) {
         event.preventDefault();
         console.log(this.titleInput.value);
+        const input = this.gatherUserInput();
+        if (Array.isArray(input)) {
+            const [title, description, people] = input;
+            console.log(title, description, people);
+        }
     }
     configure() {
         this.element.addEventListener("submit", this.submitHandler);
