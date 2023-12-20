@@ -1,3 +1,20 @@
+// validation
+interface Validatable {
+  value: string | number;
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+}
+
+const validate = (validatableInput: Validatable) => {
+  let isValid = true;
+  if (validatableInput.required) {
+    isValid = isValid &&  validatableInput.value.toString().trim().length !== 0
+  }
+}
+
 // autobind decorator
 const autoBind = (_: any, _2: string, descriptor: PropertyDescriptor) => {
   const originalMethod = descriptor.value;
@@ -44,6 +61,14 @@ class ProjectInput {
     this.configure();
     this.attach();
   }
+  private inputEmpty(): boolean {
+    const inputArray = [
+      this.titleInput.value,
+      this.descriptionInput.value,
+      this.peopleInput.value
+    ]
+    return inputArray.some(element => element.length === 0) ? true : false
+  }
 
   private gatherUserInput(): [string, string, number] | void {
     const title = this.titleInput.value;
@@ -51,15 +76,19 @@ class ProjectInput {
     const people = this.peopleInput.value;
 
     if (
-      title.trim().length == 0 ||
-      description.trim().length == 0 ||
-      people.trim().length == 0
+      this.inputEmpty()
     ) {
       alert('Invalid input');
       return;
     } else {
       return [title, description, +people]
     }
+  }
+
+  private clearInputs() {
+    this.titleInput.value = ''
+    this.descriptionInput.value = ''
+    this.peopleInput.value = ''
   }
 
   @autoBind
@@ -71,6 +100,7 @@ class ProjectInput {
       const [title, description, people] = input
       console.log(title, description, people)
     }
+    this.clearInputs()
   }
 
   private configure() {

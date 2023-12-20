@@ -5,6 +5,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+const validate = (validatableInput) => {
+    let isValid = true;
+    if (validatableInput.required) {
+        isValid = isValid && validatableInput.value.toString().trim().length !== 0;
+    }
+};
 // autobind decorator
 const autoBind = (_, _2, descriptor) => {
     const originalMethod = descriptor.value;
@@ -32,19 +38,30 @@ class ProjectInput {
         this.configure();
         this.attach();
     }
+    inputEmpty() {
+        const inputArray = [
+            this.titleInput.value,
+            this.descriptionInput.value,
+            this.peopleInput.value
+        ];
+        return inputArray.some(element => element.length === 0) ? true : false;
+    }
     gatherUserInput() {
         const title = this.titleInput.value;
         const description = this.descriptionInput.value;
         const people = this.peopleInput.value;
-        if (title.trim().length == 0 ||
-            description.trim().length == 0 ||
-            people.trim().length == 0) {
+        if (this.inputEmpty()) {
             alert('Invalid input');
             return;
         }
         else {
             return [title, description, +people];
         }
+    }
+    clearInputs() {
+        this.titleInput.value = '';
+        this.descriptionInput.value = '';
+        this.peopleInput.value = '';
     }
     submitHandler(event) {
         event.preventDefault();
@@ -54,6 +71,7 @@ class ProjectInput {
             const [title, description, people] = input;
             console.log(title, description, people);
         }
+        this.clearInputs();
     }
     configure() {
         this.element.addEventListener("submit", this.submitHandler);
