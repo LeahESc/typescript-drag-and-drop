@@ -8,11 +8,25 @@ interface Validatable {
   max?: number;
 }
 
-const validate = (validatableInput: Validatable) => {
+const validate = (validatableInput: Validatable): boolean => {
   let isValid = true;
   if (validatableInput.required) {
     isValid = isValid &&  validatableInput.value.toString().trim().length !== 0
   }
+  if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
+    isValid = isValid && validatableInput.value.length >= validatableInput.minLength
+  }
+  if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
+    isValid = isValid && validatableInput.value.length <= validatableInput.maxLength
+  }
+  if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+    isValid = isValid && validatableInput.value >= validatableInput.min
+  }
+  if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+    isValid = isValid && validatableInput.value <= validatableInput.max
+  }
+
+  return isValid
 }
 
 // autobind decorator
@@ -71,17 +85,40 @@ class ProjectInput {
   }
 
   private gatherUserInput(): [string, string, number] | void {
-    const title = this.titleInput.value;
-    const description = this.descriptionInput.value;
-    const people = this.peopleInput.value;
+    const enteredTitle = this.titleInput.value;
+    const enteredDescription = this.descriptionInput.value;
+    const enteredPeople = this.peopleInput.value;
+
+    const titleValidatable: Validatable = {
+      value: enteredTitle,
+      required: true,
+      minLength: 3,
+      maxLength: 12
+    }
+
+    const descriptionValidatable: Validatable = {
+      value: enteredDescription,
+      required: true,
+      minLength: 3,
+      maxLength: 30
+    }
+
+    const peopleValidatable: Validatable = {
+      value: enteredPeople,
+      required: true,
+      min: 1,
+      max: 5
+    }
 
     if (
-      this.inputEmpty()
+      !validate(titleValidatable) || 
+      !validate(descriptionValidatable) ||
+      !validate(peopleValidatable)
     ) {
       alert('Invalid input');
       return;
     } else {
-      return [title, description, +people]
+      return [enteredTitle, enteredDescription, +enteredPeople]
     }
   }
 
