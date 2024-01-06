@@ -98,12 +98,18 @@ class Component {
 //  project item class
 class ProjectItem {
     constructor(project) {
-        this.listItem = document.createElement('li');
+        this.container = document.createElement('li');
+        this.title = document.createElement('h4');
+        this.description = document.createElement('p');
+        this.numberOfPeople = document.createElement('p');
         this.project = project;
         this.configureItem();
     }
     configureItem() {
-        this.listItem.textContent = this.project.title + ' : ' + this.project.description;
+        this.title.textContent = this.project.title;
+        this.description.textContent = 'Description: ' + this.project.description;
+        this.numberOfPeople.textContent = 'Number of People: ' + this.project.people;
+        this.container.append(this.title, this.description, this.numberOfPeople);
     }
 }
 // project list class
@@ -120,7 +126,7 @@ class ProjectList extends Component {
         listEl.innerHTML = '';
         this.assignedProjects.forEach(project => {
             const newProjectItem = new ProjectItem(project);
-            listEl === null || listEl === void 0 ? void 0 : listEl.appendChild(newProjectItem.listItem);
+            listEl === null || listEl === void 0 ? void 0 : listEl.appendChild(newProjectItem.container);
         });
     }
     configure() {

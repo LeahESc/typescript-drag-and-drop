@@ -139,18 +139,27 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
 
 //  project item class
 class ProjectItem {
-  listItem: HTMLLIElement;
+  container: HTMLLIElement;
+  title: HTMLHeadingElement;
+  description: HTMLParagraphElement;
+  numberOfPeople: HTMLParagraphElement;
   project: Project; 
 
   constructor(project: Project) {
-    this.listItem = document.createElement('li')
+    this.container = document.createElement('li')
+    this.title = document.createElement('h4')
+    this.description = document.createElement('p')
+    this.numberOfPeople = document.createElement('p')
     this.project = project
 
     this.configureItem();
   }
 
   private configureItem() {
-    this.listItem.textContent = this.project.title + ' : ' + this.project.description
+    this.title.textContent = this.project.title 
+    this.description.textContent = 'Description: ' + this.project.description
+    this.numberOfPeople.textContent = 'Number of People: ' + this.project.people
+    this.container.append(this.title, this.description, this.numberOfPeople)
   }
 }
 
@@ -171,7 +180,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     listEl.innerHTML = ''
     this.assignedProjects.forEach(project => {
       const newProjectItem = new ProjectItem(project)
-      listEl?.appendChild(newProjectItem.listItem)
+      listEl?.appendChild(newProjectItem.container)
     })
   }
 
