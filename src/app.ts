@@ -121,7 +121,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     this.hostElement = document.getElementById(hostElementId)! as T;
     const importedNode = document.importNode(this.templateElement.content, true);
     this.element = importedNode.firstElementChild as U;
-    newElementId ? this.element.id = newElementId : this.element.id = null;
+    newElementId ? this.element.id = newElementId : this.element.id = '';
     this.attach(insertAtStart)
   }
 
@@ -135,6 +135,23 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
 
   abstract configure(): void;
   abstract renderContent(): void;
+}
+
+//  project item class
+class ProjectItem {
+  listItem: HTMLLIElement;
+  project: Project; 
+
+  constructor(project: Project) {
+    this.listItem = document.createElement('li')
+    this.project = project
+
+    this.configureItem();
+  }
+
+  private configureItem() {
+    this.listItem.textContent = this.project.title + ' : ' + this.project.description
+  }
 }
 
 // project list class
@@ -153,9 +170,8 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLElement
     listEl.innerHTML = ''
     this.assignedProjects.forEach(project => {
-      const listItem = document.createElement('li')
-      listItem.textContent = project.title
-      listEl?.appendChild(listItem)
+      const newProjectItem = new ProjectItem(project)
+      listEl?.appendChild(newProjectItem.listItem)
     })
   }
 

@@ -88,11 +88,22 @@ class Component {
         this.hostElement = document.getElementById(hostElementId);
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
-        newElementId ? this.element.id = newElementId : this.element.id = null;
+        newElementId ? this.element.id = newElementId : this.element.id = '';
         this.attach(insertAtStart);
     }
     attach(insertAtBeginning) {
         this.hostElement.insertAdjacentElement(insertAtBeginning ? 'afterbegin' : 'beforeend', this.element);
+    }
+}
+//  project item class
+class ProjectItem {
+    constructor(project) {
+        this.listItem = document.createElement('li');
+        this.project = project;
+        this.configureItem();
+    }
+    configureItem() {
+        this.listItem.textContent = this.project.title + ' : ' + this.project.description;
     }
 }
 // project list class
@@ -108,9 +119,8 @@ class ProjectList extends Component {
         const listEl = document.getElementById(`${this.type}-projects-list`);
         listEl.innerHTML = '';
         this.assignedProjects.forEach(project => {
-            const listItem = document.createElement('li');
-            listItem.textContent = project.title;
-            listEl === null || listEl === void 0 ? void 0 : listEl.appendChild(listItem);
+            const newProjectItem = new ProjectItem(project);
+            listEl === null || listEl === void 0 ? void 0 : listEl.appendChild(newProjectItem.listItem);
         });
     }
     configure() {
