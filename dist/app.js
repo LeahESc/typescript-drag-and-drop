@@ -96,20 +96,18 @@ class Component {
     }
 }
 //  project item class
-class ProjectItem {
-    constructor(project) {
-        this.container = document.createElement('li');
-        this.title = document.createElement('h4');
-        this.description = document.createElement('p');
-        this.numberOfPeople = document.createElement('p');
+class ProjectItem extends Component {
+    constructor(hostId, project) {
+        super('single-project', hostId, false, project.id);
         this.project = project;
-        this.configureItem();
+        this.configure();
+        this.renderContent();
     }
-    configureItem() {
-        this.title.textContent = this.project.title;
-        this.description.textContent = 'Description: ' + this.project.description;
-        this.numberOfPeople.textContent = 'Number of People: ' + this.project.people;
-        this.container.append(this.title, this.description, this.numberOfPeople);
+    configure() { }
+    renderContent() {
+        this.element.querySelector('h2').textContent = this.project.title;
+        this.element.querySelector('h3').textContent = 'Number of People: ' + this.project.people.toString();
+        this.element.querySelector('p').textContent = 'Description: ' + this.project.description;
     }
 }
 // project list class
@@ -125,8 +123,7 @@ class ProjectList extends Component {
         const listEl = document.getElementById(`${this.type}-projects-list`);
         listEl.innerHTML = '';
         this.assignedProjects.forEach(project => {
-            const newProjectItem = new ProjectItem(project);
-            listEl === null || listEl === void 0 ? void 0 : listEl.appendChild(newProjectItem.container);
+            const newProjectItem = new ProjectItem(document.querySelector('ul').id, project);
         });
     }
     configure() {

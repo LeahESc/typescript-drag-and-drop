@@ -138,28 +138,23 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
 }
 
 //  project item class
-class ProjectItem {
-  container: HTMLLIElement;
-  title: HTMLHeadingElement;
-  description: HTMLParagraphElement;
-  numberOfPeople: HTMLParagraphElement;
-  project: Project; 
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private project: Project; 
 
-  constructor(project: Project) {
-    this.container = document.createElement('li')
-    this.title = document.createElement('h4')
-    this.description = document.createElement('p')
-    this.numberOfPeople = document.createElement('p')
+  constructor(hostId: string, project: Project) {
+    super('single-project', hostId, false, project.id);
     this.project = project
 
-    this.configureItem();
+    this.configure();
+    this.renderContent();
   }
 
-  private configureItem() {
-    this.title.textContent = this.project.title 
-    this.description.textContent = 'Description: ' + this.project.description
-    this.numberOfPeople.textContent = 'Number of People: ' + this.project.people
-    this.container.append(this.title, this.description, this.numberOfPeople)
+  configure() {}
+  
+  renderContent() {
+    this.element.querySelector('h2')!.textContent = this.project.title
+    this.element.querySelector('h3')!.textContent = 'Number of People: ' + this.project.people.toString()
+    this.element.querySelector('p')!.textContent = 'Description: ' + this.project.description
   }
 }
 
@@ -179,8 +174,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLElement
     listEl.innerHTML = ''
     this.assignedProjects.forEach(project => {
-      const newProjectItem = new ProjectItem(project)
-      listEl?.appendChild(newProjectItem.container)
+      const newProjectItem = new ProjectItem(document.querySelector('ul')!.id, project)
     })
   }
 
