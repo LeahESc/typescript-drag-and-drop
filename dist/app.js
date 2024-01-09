@@ -97,19 +97,38 @@ class Component {
 }
 //  project item class
 class ProjectItem extends Component {
+    get persons() {
+        if (this.project.people === 1) {
+            return '1 person assigned';
+        }
+        else {
+            return this.project.people + ' people assigned';
+        }
+    }
     constructor(hostId, project) {
         super('single-project', hostId, false, project.id);
         this.project = project;
         this.configure();
         this.renderContent();
     }
-    configure() { }
+    dragStartHandler(event) {
+        console.log(event);
+    }
+    dragEndHandler(event) {
+        console.log(event, 'DragEnd');
+    }
+    configure() {
+        this.element.addEventListener('dragstart', this.dragStartHandler);
+    }
     renderContent() {
         this.element.querySelector('h2').textContent = this.project.title;
-        this.element.querySelector('h3').textContent = 'Number of People: ' + this.project.people.toString();
+        this.element.querySelector('h3').textContent = this.persons.toString();
         this.element.querySelector('p').textContent = 'Description: ' + this.project.description;
     }
 }
+__decorate([
+    autoBind
+], ProjectItem.prototype, "dragStartHandler", null);
 // project list class
 class ProjectList extends Component {
     constructor(type) {
