@@ -52,8 +52,6 @@ class ProjectState extends State<Project>{
     return this.instance
   }
 
-  
-
   addProject(title: string, description: string, numberOfPeople: number) {
     const newProject = new Project (
       Math.random().toString(),
@@ -63,6 +61,19 @@ class ProjectState extends State<Project>{
       ProjectStatus.Active
     );
     this.projects.push(newProject);
+    this.updateListeners();
+  }
+
+  changeProjectStatus(projectId: string, newStatus: ProjectStatus) {
+    const project = this.projects.find(prj => prj.id === projectId)
+    if (project) {
+      project.status = newStatus;
+      this.updateListeners()
+    }
+  }
+
+  private updateListeners() {
+    console.log('updating listeners')
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
     }
@@ -170,7 +181,8 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
   }
   @autoBind
   dragStartHandler(event: DragEvent): void {
-    console.log(event)
+    event.dataTransfer!.setData('text/plain', this.project.id);
+    event.dataTransfer!.effectAllowed = 'move';
   }
   @autoBind
   dragEndHandler(event: DragEvent): void {
@@ -178,11 +190,13 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
   }
 
   configure() {
+    console.log('projjjjjject', this.project)
     this.element.addEventListener('dragstart', this.dragStartHandler)
     this.element.addEventListener('dragend', this.dragEndHandler)
   }
   
   renderContent() {
+    console.log('PROJECT', this.project)
     this.element.querySelector('h2')!.textContent = this.project.title
     this.element.querySelector('h3')!.textContent = this.persons.toString()
     this.element.querySelector('p')!.textContent = 'Description: ' + this.project.description
@@ -201,15 +215,25 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
     this.configure();
     this.renderContent();
   }
+
   @autoBind
   dragOverHandler(event: DragEvent): void {
-    const listEl = this.element.querySelector('ul')!
-    listEl.classList.add('droppable')
+    if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+      event.preventDefault();
+      const listEl = this.element.querySelector('ul')!;
+      listEl.classList.add('droppable');
+    }
+  }
+  @autoBind
+  dropHandler(event: DragEvent): void {
+    console.log(event)
+    const projectId = event.dataTransfer!.getData('text/plain')
+    projectState.changeProjectStatus(
+      projectId, 
+      this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished
+    )    
   }
 
-  dropHandler(_: DragEvent): void {
-    
-  }
   @autoBind
   dragLeaveHandler(_: DragEvent): void {
     const listEl = this.element.querySelector('ul')!
@@ -220,7 +244,8 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
     const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLElement
     listEl.innerHTML = ''
     this.assignedProjects.forEach(project => {
-      const newProjectItem = new ProjectItem(document.querySelector('ul')!.id, project)
+      console.log(project)
+      new ProjectItem(this.element.querySelector('ul')!.id, project)
     })
   }
 
@@ -230,6 +255,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
     this.element.addEventListener('drop', this.dropHandler)
     projectState.addListener((projects: Project[]) => {
       const relevantProjects = projects.filter(prj => {
+        console.log(this.type)
         if (this.type === 'active') {
           return prj.status === ProjectStatus.Active
         } else {
@@ -246,7 +272,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
     const listId = `${this.type}-projects-list`
     this.element.querySelector('ul')!.id = listId
 
-    this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + 'PROJECTS'
+    this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS'
   }
 }
 // project input class
